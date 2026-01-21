@@ -1,6 +1,7 @@
 import argparse
 from collections import Counter, defaultdict
 from datetime import datetime
+import sys
 from traceback import print_tb
 
 
@@ -120,13 +121,22 @@ def collect_statistic(records, args):
 def parse_log_file(args):
     """ Основная точка скрипта которая парсит файл логов"""
     records = []
-
-    with open('sample_access.log', 'r') as f:
-        for line in f:
-            r = parse_line(line)
-            if r and matches_filters(record=r, args=args):
-                records.append(r)
-
+    
+    # Парсим файл
+    try:
+        with open('sample_access.log', 'r') as f:
+            for line in f:
+                record = parse_line(line)
+                if record and matches_filters(record, args):
+                    records.append(record)
+    except FileNotFoundError:
+        print(f"Error: File sample_access.log not found")
+        sys.exit(1)
+    
+    if not records:
+        print("No records found matching the filters")
+        return
+    
     stats = collect_statistic(records, args)
 
     print_results(stats, args)
