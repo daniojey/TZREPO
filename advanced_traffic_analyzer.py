@@ -24,8 +24,8 @@ def bytes_to_human(bytes_num):
         bytes_num /= 1024.0
     return f"{bytes_num:.2f} PB"
 
-
 def parse_line(line):
+    """Разбираем линию и возвращаем словарь"""
     line = line.strip().split()
     if len(line) < 6:
         return None
@@ -76,23 +76,27 @@ def collect_statistic(records, args):
     stats['unique_ips'] = len(set(r['ip'] for r in records))
     stats['total_data'] = sum(r['size'] for r in records)
 
-    # 
+    # Подсчитываем ips для топа
     ip_counter = Counter(r['ip'] for r in records)
     stats['top_ips'] = ip_counter.most_common(args.top)
 
+    # Подсчитываем методи и % их использования
     method_counter = Counter(r['method'] for r in records)
     stats['method_distribution'] = {
         method: (count / total * 100)
         for method, count in method_counter.items()
     }
 
+    # Подсчитываем 5 популярных urls
     url_counter = Counter(r['url'] for r in records)
     stats['top_urls'] = url_counter.most_common(5)
 
+    # Считаем статистику статусов
     stats['status_2xx'] = sum(1 for r in records if 200 <= r['status'] < 300)
     stats['status_4xx'] = sum(1 for r in records if 400 <= r['status'] < 500)
     stats['status_5xx'] = sum(1 for r in records if 500 <= r['status'] < 600)
 
+    # Считаем средний размер ответа для 2xx статусов
     sucessful = [r['size'] for r in records if 200 <= r['status'] < 300]
     stats['avg_size_2xx'] = sum(sucessful) / len(sucessful) if sucessful else 0
 
