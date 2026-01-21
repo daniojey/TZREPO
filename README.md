@@ -27,7 +27,7 @@
 
 ```bash
 # Клонируйте репозиторий или скачайте файл
-git clone <your-repo-url>
+git clone https://github.com/daniojey/TZREPO.git
 cd traffic-analyzer
 
 # Никаких дополнительных зависимостей устанавливать не нужно
